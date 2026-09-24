@@ -60,5 +60,26 @@ def delete_user(id):
     cur.close()
     return redirect(url_for('index'))
 
+@app.route('/search')
+def buscar():
+    busqueda = request.args.get('q', '').strip()
+
+    cursor = mysql.connection.cursor()
+
+    if busqueda:
+        sql = "SELECT * FROM user WHERE name LIKE %s OR email LIKE %s"
+        texto_busqueda = f"%{busqueda}%"
+        cursor.execute(sql, (texto_busqueda, texto_busqueda))
+    else:
+        cursor.execute("SELECT * FROM user")
+
+    usuarios = cursor.fetchall()
+    cursor.close()
+
+    return render_template('index.html', user=usuarios, busqueda=busqueda)
+
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+ 
